@@ -34,9 +34,19 @@ where
 	Input: Stream<Token = char>,
 	Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
-	todo!("you need to implement this combinator");
-	(char(' '))
-	.map(|_| AttrMap::new())
+	(
+		sep_by::<Vec<(String, String)>, _, _, _>(
+			attribute(),
+			many::<String, _, _>(space().or(newline()))
+		)
+	)
+	.map(|v| {
+		let mut res = AttrMap::new();
+		for (k, v) in v {
+			res.insert(k, v);
+		}
+		res
+	})
 }
 
 /// `open_tag` consumes `<tag_name attr_name="attr_value" ...>`.
