@@ -90,8 +90,7 @@ where
 	Input: Stream<Token = char>,
 	Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
-	todo!("you need to implement this combinator");
-	(char(' ')).map(|_| vec![Element::new("".into(), AttrMap::new(), vec![])])
+	attempt(many(choice((attempt(element()), attempt(text())))))
 }
 
 /// `text` consumes input until `<` comes.
@@ -112,8 +111,21 @@ where
 	Input: Stream<Token = char>,
 	Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
-	todo!("you need to implement this combinator");
-	(char(' ')).map(|_| Element::new("".into(), AttrMap::new(), vec![]))
+	(open_tag(), nodes(), close_tag()).and_then(
+		|((open_tag_name, attributes), children, close_tag_name)| {
+			if open_tag_name == close_tag_name {
+				Ok(Element::new(open_tag_name, attributes, children))
+			} else {
+				Err(<Input::Error as combine::error::ParseError<
+					char,
+					Input::Range,
+					Input::Position,
+				>>::StreamError::message_static_message(
+					"tag name of open tag and close tag mismatched",
+				))
+			}
+		},
+	)
 }
 
 parser! {
