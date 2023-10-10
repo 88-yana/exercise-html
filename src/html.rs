@@ -73,8 +73,15 @@ where
 	Input: Stream<Token = char>,
 	Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
-	todo!("you need to implement this combinator");
-	(char(' ')).map(|_| ("".to_string()))
+	(
+		char('<'),
+		char('/'),
+		many::<String, _, _>(space().or(newline())),
+		many1::<String, _, _>(letter()),
+		many::<String, _, _>(space().or(newline())),
+		char('>'),
+	)
+	.map(|v| (v.3))
 }
 
 // `nodes_` (and `nodes`) tries to parse input as Element or Text.
