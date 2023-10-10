@@ -55,8 +55,16 @@ where
 	Input: Stream<Token = char>,
 	Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
-	todo!("you need to implement this combinator");
-	(char(' ')).map(|_| ("".to_string(), AttrMap::new()))
+	(
+		char('<'),
+		many::<String, _, _>(space().or(newline())),
+		many1::<String, _, _>(letter()),
+		many::<String, _, _>(space().or(newline())),
+		attributes(),
+		many::<String, _, _>(space().or(newline())),
+		char('>'),
+	)
+	.map(|v| (v.2, v.4))
 }
 
 /// close_tag consumes `</tag_name>`.
