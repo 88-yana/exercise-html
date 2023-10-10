@@ -1,4 +1,4 @@
-use crate::dom::{AttrMap, Element, Node};
+use crate::dom::{AttrMap, Element, Node, Text};
 use combine::{
 	attempt,
 	error::StreamError,
@@ -100,8 +100,10 @@ where
 	Input: Stream<Token = char>,
 	Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
-	todo!("you need to implement this combinator");
-	(char(' ')).map(|_| Element::new("".into(), AttrMap::new(), vec![]))
+	let alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	let digit = "0123456789";
+	let symbol = "[].{}:;\\`'()";
+	many1::<String, _, _>(satisfy(move |c: char| alphabet.contains(c) || digit.contains(c) || symbol.contains(c) || c == ' ')).map(|v| Text::new(v))
 }
 
 /// `element` consumes `<tag_name attr_name="attr_value" ...>(children)</tag_name>`.
